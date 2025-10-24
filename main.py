@@ -1,64 +1,64 @@
 import random
 
-VOWELS = set('aeiou')
+VOCALES = set('aeiou')
 
-def rand_letter():
+def letra_aleatoria():
     return chr(ord('a') + random.randint(0, 25))
 
-def make_word(n=4):
+def crear_palabra(n=4):
     if n == 0:
         return ''
-    return rand_letter() + make_word(n-1)
+    return letra_aleatoria() + crear_palabra(n - 1)
 
-def make_row(size, cols_left=None):
-    if cols_left is None:
-        cols_left = size
-    if cols_left == 0:
+def crear_fila(tamaño, columnas_restantes=None):
+    if columnas_restantes is None:
+        columnas_restantes = tamaño
+    if columnas_restantes == 0:
         return []
-    return [make_word(4)] + make_row(size, cols_left - 1)
+    return [crear_palabra(4)] + crear_fila(tamaño, columnas_restantes - 1)
 
-def make_matrix(size, rows_left=None):
-    if rows_left is None:
-        rows_left = size
-    if rows_left == 0:
+def crear_matriz(tamaño, filas_restantes=None):
+    if filas_restantes is None:
+        filas_restantes = tamaño
+    if filas_restantes == 0:
         return []
-    return [make_row(size)] + make_matrix(size, rows_left - 1)
+    return [crear_fila(tamaño)] + crear_matriz(tamaño, filas_restantes - 1)
 
-def has_vowel(word, idx=0):
-    if idx == len(word):
+def tiene_vocal(palabra, indice=0):
+    if indice == len(palabra):
         return False
-    if word[idx] in VOWELS:
+    if palabra[indice] in VOCALES:
         return True
-    return has_vowel(word, idx + 1)
+    return tiene_vocal(palabra, indice + 1)
 
-def count_vowel_words_dc(matrix, r0, r1, c0, c1):
-    if r0 >= r1 or c0 >= c1:
+def contar_palabras_con_vocal_dc(matriz, f0, f1, c0, c1):
+    if f0 >= f1 or c0 >= c1:
         return 0
-    if r1 - r0 == 1 and c1 - c0 == 1:
-        return 1 if has_vowel(matrix[r0][c0]) else 0
-    rm = (r0 + r1) // 2
+    if f1 - f0 == 1 and c1 - c0 == 1:
+        return 1 if tiene_vocal(matriz[f0][c0]) else 0
+    fm = (f0 + f1) // 2
     cm = (c0 + c1) // 2
     return (
-        count_vowel_words_dc(matrix, r0, rm, c0, cm) +
-        count_vowel_words_dc(matrix, r0, rm, cm, c1) +
-        count_vowel_words_dc(matrix, rm, r1, c0, cm) +
-        count_vowel_words_dc(matrix, rm, r1, cm, c1)
+        contar_palabras_con_vocal_dc(matriz, f0, fm, c0, cm) +
+        contar_palabras_con_vocal_dc(matriz, f0, fm, cm, c1) +
+        contar_palabras_con_vocal_dc(matriz, fm, f1, c0, cm) +
+        contar_palabras_con_vocal_dc(matriz, fm, f1, cm, c1)
     )
 
-def _print_row(row, idx=0, acc=''):
-    if idx == len(row):
-        print(acc.rstrip())
+def _imprimir_fila(fila, indice=0, acumulado=''):
+    if indice == len(fila):
+        print(acumulado.rstrip())
         return
-    new_acc = acc + row[idx] + (' ' if idx < len(row) - 1 else '')
-    _print_row(row, idx + 1, new_acc)
+    nuevo_acumulado = acumulado + fila[indice] + (' ' if indice < len(fila) - 1 else '')
+    _imprimir_fila(fila, indice + 1, nuevo_acumulado)
 
-def print_matrix(matrix, row_idx=0):
-    if row_idx == len(matrix):
+def imprimir_matriz(matriz, indice_fila=0):
+    if indice_fila == len(matriz):
         return
-    _print_row(matrix[row_idx])
-    print_matrix(matrix, row_idx + 1)
+    _imprimir_fila(matriz[indice_fila])
+    imprimir_matriz(matriz, indice_fila + 1)
 
-def main():
+def principal():
     try:
         n = int(input('Ingrese el tamaño N de la matriz NxN: '))
     except Exception:
@@ -66,12 +66,12 @@ def main():
     if n <= 0:
         n = 8
 
-    random.seed() 
-    m = make_matrix(n)
+    random.seed()
+    m = crear_matriz(n)
     print('Matriz generada:')
-    print_matrix(m)
-    total = count_vowel_words_dc(m, 0, n, 0, n)
+    imprimir_matriz(m)
+    total = contar_palabras_con_vocal_dc(m, 0, n, 0, n)
     print(f"\nTotal de palabras con al menos una vocal: {total} de {n*n}")
 
 if __name__ == '__main__':
-    main()
+    principal()
